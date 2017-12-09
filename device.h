@@ -60,7 +60,13 @@ using namespace web::http::client;
 using namespace web::http;
 using namespace concurrency::streams;
 
-IAsyncAction bySerialPort();
-IAsyncAction byBlueTooth();
-IAsyncAction uGamepad();
-IAsyncAction uRESTtest();
+namespace juncheng {
+	IAsyncAction bySerialPort();
+	IAsyncAction byBlueTooth();
+	IAsyncAction uGamepad();
+	IAsyncAction uRESTtest();
+	IAsyncOperation<bool> menuInitialize();
+
+	static bool bluetoothIsConnected = false;
+	static bool xboxcontrollerIsConnected = false;
+}

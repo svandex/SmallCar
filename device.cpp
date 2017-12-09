@@ -4,8 +4,8 @@ const wchar_t *BSP_TARGETNAME{ L"BT-RIG01" };
 //const wchar_t *BSP_TARGETNAME{ L"HC-05" };
 const wchar_t *BBT_TARGETNAME{ L"Dev B" };
 
-void coWriteAndReadWithOneByte(uint16_t x, const DataWriter & dw, const DataReader & dr) {
-	dw.WriteInt16(x);
+void coWriteAndReadWithOneByte(uint8_t x, const DataWriter & dw, const DataReader & dr) {
+	dw.WriteByte(x);
 	//Do not exist number of 8-bit, take care local buffer.
 	//Arduino only take 8-bit from buffer while a 16-bit int has been pushed into buffer.
 
@@ -13,14 +13,12 @@ void coWriteAndReadWithOneByte(uint16_t x, const DataWriter & dw, const DataRead
 
 	dr.LoadAsync(1).get();
 
-	dr.ReadByte();
-	std::cout << "Unconsumed Buffer Length: " << dr.UnconsumedBufferLength() << ", x is " << x << std::endl;
-	if (dr.UnconsumedBufferLength() > 0) {
-		std::cout << "readFrom: " << (int)dr.ReadByte() << std::endl;
-	}
+	//dr.ReadByte();
+	//std::cout << "Unconsumed Buffer Length: " << dr.UnconsumedBufferLength() << ", x is " << x << std::endl;
+	std::cout << "readFrom: " << (int)dr.ReadByte() << std::endl;
 }
 
-IAsyncAction bySerialPort() {
+IAsyncAction juncheng::bySerialPort() {
 	auto selector = SerialDevice::GetDeviceSelector(L"COM5");//AQS string
 
 	auto result = co_await Enumeration::DeviceInformation::FindAllAsync(selector);
@@ -104,9 +102,7 @@ IAsyncAction bySerialPort() {
 	}
 }
 
-IAsyncAction byBlueTooth() {
-	//Bluetooth device selector
-	auto bdselector = Bluetooth::BluetoothDevice::GetDeviceSelector();
+IAsyncAction juncheng::byBlueTooth() {
 	//Rfcomm device selector
 	auto rfselector = Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(
 		Bluetooth::Rfcomm::RfcommServiceId::SerialPort());
@@ -115,18 +111,17 @@ IAsyncAction byBlueTooth() {
 	auto cw = Enumeration::DeviceInformation::CreateWatcher(rfselector);
 
 	uint32_t devicesFound = 0;
-	std::shared_ptr<uint32_t> deviceAdded = std::make_shared<uint32_t>(devicesFound);
 	std::wstring tdi;
 	while (true) {
 		//before start() called, only go through this branch
 		if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
-			cw.Added([=, &tdi](auto &&, Enumeration::DeviceInformation temp) {
+			cw.Added([=, &tdi, &devicesFound](auto &&, Enumeration::DeviceInformation temp) {
 				//std::wcout << "Added Device: " << temp.Name().c_str() << ", " << temp.Id().c_str() << std::endl;
 				std::cout << "Added happened." << std::endl;
-				
+
 				if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
+					devicesFound++;
 					tdi = temp.Id().c_str();
-					(*deviceAdded)++;
 				}
 			});
 
@@ -153,15 +148,14 @@ IAsyncAction byBlueTooth() {
 	}
 
 	//see how many devices has been found
-	std::cout << "Has found " << *deviceAdded << " devices" << std::endl;
+	std::cout << "Has found " << devicesFound << " devices" << std::endl;
 
-	if (*deviceAdded == 0) {
+	if (devicesFound == 0) {
 		std::cout << "Didn't find any required devices." << std::endl;
 		co_return;
 	}
 
 	//RfcommDeviceService aqusition by useing bluetooth device instanc
-	//auto targetDevice = co_await Bluetooth::BluetoothDevice::FromIdAsync(tdi);
 	auto target = co_await Bluetooth::Rfcomm::RfcommDeviceService::FromIdAsync(tdi);
 
 	//std::cout << std::endl << "Connected Device Information: " << std::endl;
@@ -185,22 +179,23 @@ IAsyncAction byBlueTooth() {
 	indr.ByteOrder(ByteOrder::BigEndian);
 
 	//Read/Write
-	int16_t x = 1;
-	uint32_t y = 2;
+	uint8_t x = 1;
+	uint16_t y = 2;
 	//char x;
 	//byte x;
-	while (std::cin >> x) {
-		if (x == 512) {
+	while (std::cin >> y) {
+		if (y == 256) {
 			break;
 		}
 
+		x = (uint8_t)y;
 		coWriteAndReadWithOneByte(x, outdw, indr);
 	}
 
 	co_return;
 }
 
-IAsyncAction uGamepad() {
+IAsyncAction juncheng::uGamepad() {
 	bool isConnected = false;
 	Gamepad::GamepadAdded([=](auto &&, Gamepad newAdded) {
 		// add lock to prevent routines write to std::cout simutaneously
@@ -266,7 +261,7 @@ IAsyncAction uGamepad() {
 	co_return;
 }
 
-IAsyncAction uRESTtest() {
+IAsyncAction juncheng::uRESTtest() {
 	auto fileStream = std::make_shared<ostream>();
 
 	// Open stream to output file.
@@ -310,4 +305,66 @@ IAsyncAction uRESTtest() {
 
 	return 0;
 
+}
+
+IAsyncOperation<bool> juncheng::menuInitialize() {
+	//bluetooth initialization process
+	//Rfcomm device selector
+	auto rfselector = Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(
+		Bluetooth::Rfcomm::RfcommServiceId::SerialPort());
+
+	//DeviceWatcher to add each device
+	auto cw = Enumeration::DeviceInformation::CreateWatcher(rfselector);
+
+	uint32_t devicesFound = 0;
+	std::vector<std::wstring> deviceInfoList;
+	//std::wstring tdi;
+
+	//before start() called, only go through this branch
+	if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
+		cw.Added([=, &deviceInfoList, &devicesFound](auto &&, Enumeration::DeviceInformation temp) {
+			//std::wcout << "Added Device: " << temp.Name().c_str() << ", " << temp.Id().c_str() << std::endl;
+			std::cout << "Added happened." << std::endl;
+			//tdi = temp.Id().c_str();
+			deviceInfoList.push_back(temp.Id().c_str());
+			/*
+			if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
+				devicesFound++;
+			}
+			*/
+		});
+
+		cw.Updated([=](auto &&, Enumeration::DeviceInformationUpdate temp) {
+			std::cout << "Updated Happened." << std::endl;
+			std::wcout << "Updated ID: " << temp.Id().c_str() << std::endl;
+		});
+
+		cw.EnumerationCompleted([=](auto &&, auto &&) {
+			std::cout << "Bluetooth initialization ends." << std::endl;
+			if (devicesFound > 0) {
+				bluetoothIsConnected = true;
+			}
+			cw.Stop();
+		});
+
+		cw.Start();
+	}
+
+	if (cw.Status() == Enumeration::DeviceWatcherStatus::Started) {
+		std::cout << "Bluetooth initialization...." << std::endl;
+	}
+
+	while (!bluetoothIsConnected) {
+
+	}
+
+	uint16_t option;
+	std::cout << "Welcome to LittleCar System: "
+		<< std::endl << "1. Start..."
+		<< std::endl << "2. Exit..." << std::endl
+		<< std::endl << "Please Select: " << std::endl;
+
+	std::cin >> option;
+
+	co_return true;
 }
