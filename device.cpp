@@ -116,7 +116,8 @@ IAsyncAction juncheng::byBlueTooth() {
 		//before start() called, only go through this branch
 		if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
 			cw.Added([=, &tdi, &devicesFound](auto &&, Enumeration::DeviceInformation temp) {
-				//std::wcout << "Added Device: " << temp.Name().c_str() << ", " << temp.Id().c_str() << std::endl;
+				std::wcout << "Device Name: " << temp.Name().c_str() <<std::endl
+				<< "Device ID: " << temp.Id().c_str() << std::endl;
 				std::cout << "Added happened." << std::endl;
 
 				if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
