@@ -116,8 +116,9 @@ IAsyncAction juncheng::byBlueTooth() {
 		//before start() called, only go through this branch
 		if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
 			cw.Added([=, &tdi, &devicesFound](auto &&, Enumeration::DeviceInformation temp) {
-				std::wcout << "Device Name: " << temp.Name().c_str() <<std::endl
-				<< "Device ID: " << temp.Id().c_str() << std::endl;
+				std::wcout << "Device Name: " << temp.Name().c_str() << std::endl
+					<< "Device ID: " << temp.Id().c_str() << std::endl
+					<< "isPaired: " << temp.Pairing().IsPaired() << std::endl;
 				std::cout << "Added happened." << std::endl;
 
 				if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
@@ -260,52 +261,6 @@ IAsyncAction juncheng::uGamepad() {
 	}
 
 	co_return;
-}
-
-IAsyncAction juncheng::uRESTtest() {
-	auto fileStream = std::make_shared<ostream>();
-
-	// Open stream to output file.
-	pplx::task<void> requestTask = fstream::open_ostream(U("C:/Users/svandex/Desktop/results.html")).then([=](ostream outFile)
-	{
-		*fileStream = outFile;
-
-		// Create http_client to send the request.
-		http_client client(U("http://www.bing.com/"));
-
-		// Build request URI and start the request.
-		uri_builder builder(U("/search"));
-		builder.append_query(U("q"), U("cpprestsdk github"));
-		return client.request(methods::GET, builder.to_string());
-	})
-
-		// Handle response headers arriving.
-		.then([=](http_response response)
-	{
-		printf("Received response status code:%u\n", response.status_code());
-
-		// Write response body into the file.
-		return response.body().read_to_end(fileStream->streambuf());
-	})
-
-		// Close the file stream.
-		.then([=](size_t)
-	{
-		return fileStream->close();
-	});
-
-	// Wait for all the outstanding I/O to complete and handle any exceptions
-	try
-	{
-		requestTask.wait();
-	}
-	catch (const std::exception &e)
-	{
-		printf("Error exception:%s\n", e.what());
-	}
-
-	return 0;
-
 }
 
 IAsyncOperation<bool> juncheng::menuInitialize() {
