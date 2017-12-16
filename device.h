@@ -33,9 +33,11 @@
 //openFrameworks
 //#include<ofArduino.h>
 
+/*
 //cpprest
 #include<cpprest/http_client.h>
 #include<cpprest/filestream.h>
+*/
 
 using namespace winrt;
 using namespace winrt::Windows::Devices;
@@ -53,12 +55,14 @@ using namespace winrt::Windows::Foundation::Collections;
 using namespace winrt::Windows::Gaming::Input;
 using namespace std::experimental;
 
+/*
 //cpprest
 using namespace utility;
 using namespace web;
 using namespace web::http::client;
 using namespace web::http;
 using namespace concurrency::streams;
+*/
 
 namespace juncheng {
 	IAsyncAction bySerialPort();
