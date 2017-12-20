@@ -1,8 +1,11 @@
 #include "device.h"
 
-const wchar_t *BSP_TARGETNAME{ L"BT-RIG01" };
-//const wchar_t *BSP_TARGETNAME{ L"HC-05" };
+//const wchar_t *BSP_TARGETNAME{ L"BT-RIG01" };
+const wchar_t *BSP_TARGETNAME{ L"HC-05" };
 const wchar_t *BBT_TARGETNAME{ L"Dev B" };
+
+const wchar_t *bthaddr_1{L"83:85:27:3d:ac-20:17:11:14:01:31"};//comment to describe device
+const wchar_t *bthaddr_2{L"83:85:27:3d:ac-20:17:09:02:17:80"};//comment to describe device
 
 void coWriteAndReadWithOneByte(uint8_t x, const DataWriter & dw, const DataReader & dr) {
 	dw.WriteByte(x);
@@ -49,7 +52,7 @@ IAsyncAction juncheng::bySerialPort() {
 	}
 
 	if (isPairedDevices == 0) { std::cout << "No Device Has Ever Paired Before !" << std::endl; co_return; }
-	if (tIndex == -1) { std::cout << "No TARGETNAME device" << std::endl; co_return; }
+	if (tIndex == -1) { std::cout << "No TARGETNAME device!" << std::endl; co_return; }
 	//connect to the bluetooth device
 	std::cout << "connecting......" << std::endl << std::endl;
 	auto targetDevice = co_await SerialDevice::FromIdAsync(result.GetAt(tIndex).Id());
@@ -117,11 +120,15 @@ IAsyncAction juncheng::byBlueTooth() {
 		if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
 			cw.Added([=, &tdi, &devicesFound](auto &&, Enumeration::DeviceInformation temp) {
 				std::wcout << "Device Name: " << temp.Name().c_str() << std::endl
-					<< "Device ID: " << temp.Id().c_str() << std::endl
-					<< "isPaired: " << temp.Pairing().IsPaired() << std::endl;
+					<< "Device ID: " << temp.Id().c_str() << std::endl;
+
+					//<< "isPaired: " << temp.Pairing().IsPaired() << std::endl;
+				//isPaired function doesnt' work.
 				std::cout << "Added happened." << std::endl;
 
-				if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
+			//	if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
+				std::wcout<<"Result: "<<std::wcsstr(temp.Id().c_str(),bthaddr_1)<<std::endl;
+				if(std::wcsstr(temp.Id().c_str(),bthaddr_1)){
 					devicesFound++;
 					tdi = temp.Id().c_str();
 				}
