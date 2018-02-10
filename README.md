@@ -1,10 +1,10 @@
-# mylittlecar
+# SmallCar
 This is my project for fun, used to explore technology in SLAM and AR field.
 
-## rig
+## Component
 
-* Raspberry Pi runing on Windows IoT
+* Raspberry Pi runing on Ubuntu Mate
 * Two Motors, one is used for powertrain, one is used for steering
-* Using Windows Runtime to control GPIO, Wifi connection, Xbox One Controller connection
-* Using REST to deploy HTTP server
+* Using `joan2937/pigpio` to control GPIO
+* Using `microsoft/cpprestsdk` to deploy HTTP server
 
