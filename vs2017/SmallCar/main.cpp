@@ -33,8 +33,8 @@ std::unique_ptr<SmallCarServer> g_http;
 
 void on_initialize(const string_t& address) {
 	uri_builder uri(address);
-	uri.append_path(U("Action"));
-
+	// address:port/Action
+	//uri.append_path(U(""));
 	auto addr = uri.to_uri().to_string();
 	g_http = std::unique_ptr<SmallCarServer>(new SmallCarServer(addr));
 	g_http->open().wait();
