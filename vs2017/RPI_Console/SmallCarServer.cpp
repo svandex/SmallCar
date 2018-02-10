@@ -23,8 +23,8 @@ void SmallCarServer::handle_get(http_request message)
 {
 	const int num = 5;
 	ucout << message.to_string() << std::endl;
-	gpio.ledFlash(num);
 	message.reply(status_codes::OK);
+	gpio.ledFlash(num);
 }
 
 void SmallCarServer::handle_put(http_request message)
