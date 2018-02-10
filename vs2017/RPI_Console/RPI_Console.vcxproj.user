@@ -4,5 +4,6 @@
     <PreLaunchCommand>
     </PreLaunchCommand>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
+    <RemoteTarget>799941059;10.254.239.1 (username=, port=22, authentication=Password)</RemoteTarget>
   </PropertyGroup>
 </Project>

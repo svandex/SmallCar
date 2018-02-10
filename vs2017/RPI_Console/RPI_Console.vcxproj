@@ -61,19 +61,23 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>C:\Users\svandexcn\GitHub\pigpio;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_cpprest.cpp" />
+    <ClCompile Include="SmallCarGPIO.cpp" />
+    <ClCompile Include="SmallCarServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SmallCarGPIO.h" />
+    <ClInclude Include="SmallCarServer.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>-std=c++11</AdditionalOptions>
       <LibraryDependencies>%(LibraryDependencies)</LibraryDependencies>
-      <AdditionalDependencies>-lpigpio;-lrt;-pthread;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lcpprest;-lmicrohttpd;-lnghttp2;-lnghttp2_asio;-lboost_system;-lssl;-lcrypto;-lpigpio;-lrt;-pthread;%(AdditionalDependencies)</AdditionalDependencies>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
