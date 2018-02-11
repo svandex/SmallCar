@@ -25,44 +25,56 @@ SmallCarServer::~SmallCarServer()
 
 void SmallCarServer::handle_get(http_request message)//If request has empty body, means he want the index.html
 {
-	const int num = 5;
 	ucout << message.to_string() << std::endl;
 
-	//message.reply(status_codes::OK);
-	http_response message_response;
-
-	message_response.headers().set_content_type("text/html");
 	utility::string_t currentpath = get_current_dir_name();
-	currentpath += "/index.html";
-	ucout << currentpath << std::endl;
+	//Client needs html and javascript code to interact with server
+	//Return two or more files back to client, each with a HTTP frame
+
+	//reply with the first response, return html code to client
+	http_response message_response;
+	message_response.headers().set_content_type("text/html");
+	utility::string_t index_html_path = currentpath + "/index.html";
+	//ucout << currentpath << std::endl;
 
 	try {
-		Concurrency::streams::file_stream<uint8_t>::open_istream(currentpath).then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
+		Concurrency::streams::file_stream<uint8_t>::open_istream(index_html_path).then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
 			message_response.set_body(response_basic_istream);
 		});
-	}catch(std::exception const &e){
-		std::wcout << e.what() << std::endl;
 	}
-	/*
-	message_response.set_body(U("<html>\
-<title>Test Demo</title>\
-<body><h1>Hellow World</h1><br/>\
-<form action=\"\" method=\"POST\" target=\"nn\" enctype=\"text/plain\">\
-<input type=\"text\" name=\"delayTime\"value=\"5\"/><br/><br/>\
-<input type=\"submit\" value=\"Yellow LED Flash\"/></form></body>\
-<iframe id=\"idid\" name=\"nn\" style=\"display:none;\" />\
-</html>"));
-*/
+	catch (std::exception const &e) {
+		std::wcout << "Exception: " << e.what() << std::endl;
+		//Error occured, internal error return.
+		message_response.set_status_code(status_codes::InternalError);
+		message.reply(message_response);
+		return;
+	}
 	message_response.set_status_code(status_codes::OK);
 
-	//reply with the second response
-	http_response message_response_2th;
-	message_response_2th.headers().set_content_type("text/html");
+	//reply with the second response, return javascript code to client
+	http_response message_response_code;
+	message_response_code.headers().set_content_type("text/javascript");
+	utility::string_t js_path = currentpath + "/libdemo.js";
+	try {
+		Concurrency::streams::file_stream<uint8_t>::open_istream(js_path).then([&message_response_code](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
+			message_response_code.set_body(response_basic_istream);
+		});
+	}
+	catch (std::exception const &e) {
+		std::wcout << "Exception: " << e.what() << std::endl;
+		//Error occured, internal error return.
+		message_response_code.set_status_code(status_codes::InternalError);
+		message.reply(message_response_code);
+		return;
+	}
+	message_response_code.set_status_code(status_codes::OK);
 
 	//Print response and replay to the request
 	ucout << message_response.to_string() << std::endl;
 	message.reply(message_response);
+	message.reply(message_response_code);
 
+	const int num = 5;
 	gpio.ledFlash(num, 1);
 }
 

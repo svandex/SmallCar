@@ -63,6 +63,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <IncludePath>C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include\arm-linux-gnueabihf;C:\Users\svandex\Documents\Ubuntu.RPi\usr\local\include\include;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include;C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)index.html;$(ProjectDir)canvasjs.min.js;$(AdditionalSourcesToCopyMapping)</AdditionalSourcesToCopyMapping>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -72,6 +73,10 @@
   <ItemGroup>
     <ClInclude Include="SmallCarGPIO.h" />
     <ClInclude Include="SmallCarServer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="canvasjs.min.js" />
+    <None Include="index.html" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
