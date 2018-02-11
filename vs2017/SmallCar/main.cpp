@@ -22,7 +22,6 @@ Feature:
 	gamepad controller
 	servo control
 */
-
 #include "SmallCarServer.h"
 
 using namespace web;
