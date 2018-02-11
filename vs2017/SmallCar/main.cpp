@@ -1,6 +1,7 @@
 /*
 Author: Qiu Juncheng
-Email: qiujuncheng@saicmotor.com svandex@outlook.com
+Company Email: qiujuncheng@saicmotor.com 
+Personal Email: svandex@outlook.com
 GitHub: http://github.com/svandex
 Date: 2018-02-08
 

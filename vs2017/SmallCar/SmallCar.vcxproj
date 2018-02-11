@@ -62,7 +62,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include\arm-linux-gnueabihf;C:\Users\svandex\Documents\Ubuntu.RPi\usr\local\include\include;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include;C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

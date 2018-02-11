@@ -1,5 +1,8 @@
 ﻿#include "SmallCarServer.h"
 #include <regex>
+#include <cpprest/streams.h>
+#include <cpprest/filestream.h>
+#include <unistd.h>
 
 SmallCarGPIO SmallCarServer::gpio;
 
@@ -29,19 +32,37 @@ void SmallCarServer::handle_get(http_request message)//If request has empty body
 	http_response message_response;
 
 	message_response.headers().set_content_type("text/html");
+	utility::string_t currentpath = get_current_dir_name();
+	currentpath += "/index.html";
+	ucout << currentpath << std::endl;
+
+	try {
+		Concurrency::streams::file_stream<uint8_t>::open_istream(currentpath).then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
+			message_response.set_body(response_basic_istream);
+		});
+	}catch(std::exception const &e){
+		std::wcout << e.what() << std::endl;
+	}
+	/*
 	message_response.set_body(U("<html>\
 <title>Test Demo</title>\
 <body><h1>Hellow World</h1><br/>\
 <form action=\"\" method=\"POST\" target=\"nn\" enctype=\"text/plain\">\
-<input type=\"text\" name=\"delayTime\"value=\"5\"/><br/>\
+<input type=\"text\" name=\"delayTime\"value=\"5\"/><br/><br/>\
 <input type=\"submit\" value=\"Yellow LED Flash\"/></form></body>\
 <iframe id=\"idid\" name=\"nn\" style=\"display:none;\" />\
 </html>"));
+*/
 	message_response.set_status_code(status_codes::OK);
+
+	//reply with the second response
+	http_response message_response_2th;
+	message_response_2th.headers().set_content_type("text/html");
 
 	//Print response and replay to the request
 	ucout << message_response.to_string() << std::endl;
 	message.reply(message_response);
+
 	gpio.ledFlash(num, 1);
 }
 
