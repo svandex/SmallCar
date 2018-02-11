@@ -62,8 +62,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include\arm-linux-gnueabihf;C:\Users\svandex\Documents\Ubuntu.RPi\usr\local\include\include;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include;C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
-    <AdditionalSourcesToCopyMapping>$(ProjectDir)index.html;$(ProjectDir)canvasjs.min.js;$(AdditionalSourcesToCopyMapping)</AdditionalSourcesToCopyMapping>
+    <IncludePath>C:\Users\svandexcn\Documents\RPi3_include\include\c++\5.4.0;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include\arm-linux-gnueabihf;C:\Users\svandex\Documents\Ubuntu.RPi\usr\local\include\include;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include;C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
+    <AdditionalSourcesToCopyMapping>
+    </AdditionalSourcesToCopyMapping>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely);$(ProjectDir)index.html;$(ProjectDir)canvasjs.min.js;$(ProjectDir)favicon.ico</SourcesToCopyRemotelyOverride>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -77,6 +79,9 @@
   <ItemGroup>
     <None Include="canvasjs.min.js" />
     <None Include="index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="favicon.ico" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
