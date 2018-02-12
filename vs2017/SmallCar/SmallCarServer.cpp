@@ -23,7 +23,7 @@ SmallCarServer::~SmallCarServer()
 {
 }
 
-void SmallCarServer::handle_get(http_request message)//If request has empty body, means he want the index.html
+void SmallCarServer::handle_get(http_request message)
 {
 	//ucout << message.to_string() << std::endl;
 	ucout << message.absolute_uri().to_string() << std::endl;
@@ -39,11 +39,19 @@ void SmallCarServer::handle_get(http_request message)//If request has empty body
 		utility::string_t index_html_path = currentpath + "/../../../index.html";
 		//ucout << currentpath << std::endl;
 
+		pplx::task<void> requestTask = Concurrency::streams::file_stream<uint8_t>::open_istream(index_html_path)
+
+			.then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
+			message_response.set_body(response_basic_istream);
+			return message_response;
+		})
+			.then([&message](http_response message_response) {
+			message_response.set_status_code(status_codes::OK);
+			message.reply(message_response);
+		});
+
 		try {
-			Concurrency::streams::file_stream<uint8_t>::open_istream(index_html_path).then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
-				message_response.set_body(response_basic_istream);
-				response_basic_istream.close().get();
-			});
+			requestTask.wait();
 		}
 		catch (std::exception const &e) {
 			std::wcout << "Exception: " << e.what() << std::endl;
@@ -52,18 +60,26 @@ void SmallCarServer::handle_get(http_request message)//If request has empty body
 			message.reply(message_response);
 			return;
 		}
-		message_response.set_status_code(status_codes::OK);
 	}
 
 	//URI "/canvasjs.min.js" return the canvasjs.min.js file
 	if (message.absolute_uri().to_string() == "/canvasjs.min.js") {
 		message_response.headers().set_content_type("text/javascript");
 		utility::string_t js_path = currentpath + "/../../../canvasjs.min.js";
+
+		pplx::task<void> requestTask = Concurrency::streams::file_stream<uint8_t>::open_istream(js_path)
+
+			.then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
+			message_response.set_body(response_basic_istream);
+			return message_response;
+		})
+			.then([&message](http_response message_response) {
+			message_response.set_status_code(status_codes::OK);
+			message.reply(message_response);
+		});
+
 		try {
-			Concurrency::streams::file_stream<uint8_t>::open_istream(js_path).then([&message_response](Concurrency::streams::basic_istream<uint8_t> response_basic_istream) {
-				message_response.set_body(response_basic_istream);
-				response_basic_istream.close().get();
-			});
+			requestTask.wait();
 		}
 		catch (std::exception const &e) {
 			std::wcout << "Exception: " << e.what() << std::endl;
@@ -72,19 +88,26 @@ void SmallCarServer::handle_get(http_request message)//If request has empty body
 			message.reply(message_response);
 			return;
 		}
-		message_response.set_status_code(status_codes::OK);
 	}
 
 	//URI "/favicon.ico" return the ico file
 	if (message.absolute_uri().to_string() == "/favicon.ico") {
 		message_response.headers().set_content_type("image/x-icon");
 		utility::string_t js_path = currentpath + "/../../../favicon.ico";
+
+		pplx::task<void> requestTask= Concurrency::streams::file_buffer<uint8_t>::open(js_path, std::ios_base::in)
+			.then([&message_response](Concurrency::streams::streambuf<uint8_t> response_streambuf) {
+			auto temp_stream = Concurrency::streams::basic_istream<uint8_t>(response_streambuf);
+			message_response.set_body(temp_stream);
+			return message_response; 
+		})
+			.then([&message](http_response message_response){
+			message_response.set_status_code(status_codes::OK);
+			message.reply(message_response);
+		});
+
 		try {
-			Concurrency::streams::file_buffer<uint8_t>::open(js_path,std::ios_base::in).then([&message_response](Concurrency::streams::streambuf<uint8_t> response_streambuf) {
-				auto temp_stream = Concurrency::streams::basic_istream<uint8_t>(response_streambuf);
-				message_response.set_body(temp_stream);
-				temp_stream.close().get();
-			});
+			requestTask.wait();
 		}
 		catch (std::exception const &e) {
 			std::wcout << "Exception: " << e.what() << std::endl;
@@ -93,15 +116,13 @@ void SmallCarServer::handle_get(http_request message)//If request has empty body
 			message.reply(message_response);
 			return;
 		}
-		message_response.set_status_code(status_codes::OK);
 	}
 	//Print response and replay to the request
 	ucout << message_response.to_string() << std::endl;
-	message.reply(message_response);
 	//ucout <<"Has responed to "<< message.absolute_uri().to_string() << std::endl;
 
 	const int num = 5;
-	//gpio.ledFlash(num, 1);
+	gpio.ledFlash(num, 1);
 }
 
 void SmallCarServer::handle_put(http_request message)//If request has content body
