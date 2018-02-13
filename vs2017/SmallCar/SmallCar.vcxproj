@@ -65,7 +65,7 @@
     <IncludePath>C:\Users\svandexcn\Documents\RPi3_include\include\c++\5.4.0;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include\arm-linux-gnueabihf;C:\Users\svandex\Documents\Ubuntu.RPi\usr\local\include\include;C:\Users\svandex\Documents\Ubuntu.RPi\usr\include\include;C:\Users\svandexcn\Documents\RPi3_include\include\arm-linux-gnueabihf;C:\Users\svandexcn\Documents\RPi3_include\local;C:\Users\svandexcn\Documents\RPi3_include\include;$(IncludePath)</IncludePath>
     <AdditionalSourcesToCopyMapping>
     </AdditionalSourcesToCopyMapping>
-    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely);$(ProjectDir)index.html;$(ProjectDir)canvasjs.min.js;$(ProjectDir)favicon.ico</SourcesToCopyRemotelyOverride>
+    <SourcesToCopyRemotelyOverride>@(SourcesToCopyRemotely);@(DataFilesToCopyRemotely);$(ProjectDir)res/index.html;$(ProjectDir)res/canvasjs.min.js;$(ProjectDir)res/favicon.ico</SourcesToCopyRemotelyOverride>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -77,11 +77,11 @@
     <ClInclude Include="SmallCarServer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="canvasjs.min.js" />
-    <None Include="index.html" />
+    <None Include="res\canvasjs.min.js" />
+    <None Include="res\index.html" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="favicon.ico" />
+    <Image Include="res\favicon.ico" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
