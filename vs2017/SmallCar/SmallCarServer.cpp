@@ -36,7 +36,7 @@ void SmallCarServer::handle_get(http_request message)
 	//URI "/" return the default index.html
 	if (message.absolute_uri().to_string() == "/") {
 		message_response.headers().set_content_type("text/html");
-		utility::string_t index_html_path = currentpath + "/../../../index.html";
+		utility::string_t index_html_path = currentpath + "/../../../res/index.html";
 		//ucout << currentpath << std::endl;
 
 		pplx::task<void> requestTask = Concurrency::streams::file_stream<uint8_t>::open_istream(index_html_path)
@@ -48,6 +48,9 @@ void SmallCarServer::handle_get(http_request message)
 			.then([&message](http_response message_response) {
 			message_response.set_status_code(status_codes::OK);
 			message.reply(message_response);
+
+			const int num = 5;
+			gpio.ledFlash(num, 1);
 		});
 
 		try {
@@ -65,7 +68,7 @@ void SmallCarServer::handle_get(http_request message)
 	//URI "/canvasjs.min.js" return the canvasjs.min.js file
 	if (message.absolute_uri().to_string() == "/canvasjs.min.js") {
 		message_response.headers().set_content_type("text/javascript");
-		utility::string_t js_path = currentpath + "/../../../canvasjs.min.js";
+		utility::string_t js_path = currentpath + "/../../../res/canvasjs.min.js";
 
 		pplx::task<void> requestTask = Concurrency::streams::file_stream<uint8_t>::open_istream(js_path)
 
@@ -93,15 +96,15 @@ void SmallCarServer::handle_get(http_request message)
 	//URI "/favicon.ico" return the ico file
 	if (message.absolute_uri().to_string() == "/favicon.ico") {
 		message_response.headers().set_content_type("image/x-icon");
-		utility::string_t js_path = currentpath + "/../../../favicon.ico";
+		utility::string_t js_path = currentpath + "/../../../res/favicon.ico";
 
-		pplx::task<void> requestTask= Concurrency::streams::file_buffer<uint8_t>::open(js_path, std::ios_base::in)
+		pplx::task<void> requestTask = Concurrency::streams::file_buffer<uint8_t>::open(js_path, std::ios_base::in)
 			.then([&message_response](Concurrency::streams::streambuf<uint8_t> response_streambuf) {
 			auto temp_stream = Concurrency::streams::basic_istream<uint8_t>(response_streambuf);
 			message_response.set_body(temp_stream);
-			return message_response; 
+			return message_response;
 		})
-			.then([&message](http_response message_response){
+			.then([&message](http_response message_response) {
 			message_response.set_status_code(status_codes::OK);
 			message.reply(message_response);
 		});
@@ -118,11 +121,8 @@ void SmallCarServer::handle_get(http_request message)
 		}
 	}
 	//Print response and replay to the request
-	ucout << message_response.to_string() << std::endl;
+	//ucout << message_response.to_string() << std::endl;
 	//ucout <<"Has responed to "<< message.absolute_uri().to_string() << std::endl;
-
-	const int num = 5;
-	gpio.ledFlash(num, 1);
 }
 
 void SmallCarServer::handle_put(http_request message)//If request has content body
@@ -134,7 +134,7 @@ void SmallCarServer::handle_put(http_request message)//If request has content bo
 void SmallCarServer::handle_post(http_request message)
 {
 	const int num = 6;
-	ucout << message.to_string() << std::endl;
+	//ucout << message.to_string() << std::endl;
 	std::string temp = message.extract_string(true).get();
 
 	//use regex to get delaytime
@@ -143,9 +143,10 @@ void SmallCarServer::handle_post(http_request message)
 
 	message.reply(status_codes::OK);
 	if (std::regex_search(temp.c_str(), tempSm, tempRegex)) {
-		ucout << tempSm.size() << std::endl;
+	/*	ucout << tempSm.size() << std::endl;
 		ucout << tempSm[0].length() << std::endl;
 		ucout << tempSm[0].str() << std::endl;
+		*/
 	}
 	if (tempSm.size() > 0) {
 		gpio.ledFlash(num, std::atoi(tempSm[0].str().c_str()));
