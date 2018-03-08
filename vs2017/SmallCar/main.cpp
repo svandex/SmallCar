@@ -1,9 +1,14 @@
 /*
-Author: Qiu Juncheng
-Company Email: qiujuncheng@saicmotor.com 
+Author1: Qiu Juncheng
+Company Email: qiujuncheng@saicmotor.com
 Personal Email: svandex@outlook.com
-GitHub: http://github.com/svandex
-Date: 2018-02-08
+GitHub: https://github.com/svandex
+
+Author2: Jiang Lifu
+Company Email: jianglifu@saicmotor.com
+Personal Email: 2638696515@q.com
+GitHub: https://github.com/FrogGuaGuaGua
+Date: 2018-03-08
 
 Package Dependency:
 	cpprest						http://github.com/microsoft/cpprestsdk
