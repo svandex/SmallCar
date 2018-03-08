@@ -34,7 +34,7 @@
 .vs/*
 .vscode/*
 build/*
-vs2017/Debug/*
-vs2017/.vs/*
-vs2017/SmallCar/bin/*
-vs2017/SmallCar/obj/*
+linux/Debug/*
+linux/.vs/*
+linux/SmallCar/bin/*
+linux/SmallCar/obj/*
