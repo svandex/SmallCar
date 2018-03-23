@@ -15,6 +15,6 @@ protected:
 	BlueToothDevice();
 
 	//Rfcomm device selector
-	 rfselector = Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort());
-	auto cw = Enumeration::DeviceInformation::CreateWatcher(rfselector);
+	static auto rfselector = Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort());
+	static auto cw = Enumeration::DeviceInformation::CreateWatcher(rfselector);
 };

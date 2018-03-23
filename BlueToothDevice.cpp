@@ -12,4 +12,5 @@ BlueToothDevice * BlueToothDevice::Instance()
 
 BlueToothDevice::BlueToothDevice()
 {
+	cw.
 }
