@@ -1,20 +1,29 @@
 #pragma once
 
-#include "stdafx.h"
-
+#include <winrt\Windows.Devices.Bluetooth.Rfcomm.h>
+#include <winrt\Windows.Devices.Enumeration.h>
 #include <memory>
+#include <iostream>
+#include <stdexcept>
+
+using namespace winrt;
+using namespace Windows::Devices;
 
 class BlueToothDevice {//Singleton Pattern, only one instance exist
 public:
 	~BlueToothDevice() {};
 	static BlueToothDevice* Instance();
+	void on_initialise();
+protected:
+	static std::shared_ptr<BlueToothDevice> m_pInstance;
+private:
+	//create watcher
+	static Enumeration::DeviceWatcher cw;
 
 	//data member
-	static std::shared_ptr<BlueToothDevice> m_pInstance;
-protected:
-	BlueToothDevice();
+	std::wstring tdi=L"";// Bluetooth Device you want to connect to
+	uint32_t devicesFound = 0;
 
-	//Rfcomm device selector
-	static auto rfselector = Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort());
-	static auto cw = Enumeration::DeviceInformation::CreateWatcher(rfselector);
+	//private ctor
+	BlueToothDevice();
 };
