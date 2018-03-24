@@ -1,13 +1,25 @@
 #pragma once
 
-#include "device.h"
+#include <winrt\Windows.System.h>
+#include <winrt\Windows.Gaming.Input.h>
+#include <winrt\Windows.Devices.Power.h>
+#include <memory>
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <stdexcept>
 
-namespace juncheng {
-	class XboxController {
-	public:
-		XboxController();
-		Gamepad mygamepad;
-	private:
-		bool isConnected;
-	};
-}
+using namespace winrt::Windows::Gaming::Input;
+using namespace winrt::Windows::Devices::Power;
+
+class XboxController {
+public:
+	static std::shared_ptr<Gamepad> Instance();
+	static void showBattery();
+protected:
+	static std::shared_ptr<Gamepad> m_XboxController;
+private:
+	XboxController();
+
+	bool isConnected;
+};
