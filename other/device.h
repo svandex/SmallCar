@@ -40,6 +40,7 @@
 */
 
 using namespace winrt;
+
 using namespace winrt::Windows::Devices;
 using namespace winrt::Windows::Devices::SerialCommunication;
 using namespace winrt::Windows::Devices::Bluetooth::Rfcomm;
