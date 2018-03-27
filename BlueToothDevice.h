@@ -27,16 +27,18 @@ public:
 	void disconnect();
 	bool send(std::shared_ptr<void> payload);
 	std::shared_ptr<void> receive();
+
+	std::ostream& operator<< (std::ostream& os);
 protected:
 	static std::shared_ptr<BlueToothDevice> m_pInstance;
 private:
-	static Enumeration::DeviceWatcher cw;
-	std::shared_ptr<RfcommDeviceService> tDevice = nullptr;
-	StreamSocket btSS;
+	static Enumeration::DeviceWatcher m_DeviceWatcher;
+	std::shared_ptr<RfcommDeviceService> m_RfcommDeviceService = nullptr;
+	StreamSocket m_StreamSocket;
 
 	//data member
-	hstring tdi = L"";// Bluetooth Device you want to connect to
-	uint32_t devicesFound = 0;
+	hstring m_DeviceName = L"";// Bluetooth Device you want to connect to
+	uint32_t m_DevicesFound = 0;
 
 	//private ctor
 	BlueToothDevice();

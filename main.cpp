@@ -24,9 +24,9 @@ int main() {
 		while (XboxController::isConnected) {
 			oldReading = newReading;
 			newReading = mygamepad->GetCurrentReading();
-			//if newReading != oldReading, start a new thread to do response
-			//make sure controller recognise your continous input
-			//make sure loop in main thread not block
+			//if bluetooth device block, responsiveness is bad
+			//Async programming or Start a new thread
+
 		}
 	}
 	//TWO SITUATIONS:

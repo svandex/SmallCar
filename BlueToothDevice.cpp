@@ -2,7 +2,7 @@
 
 #include "BlueToothDevice.h"
 
-Enumeration::DeviceWatcher BlueToothDevice::cw = Enumeration::DeviceInformation::CreateWatcher(Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort()));
+Enumeration::DeviceWatcher BlueToothDevice::m_DeviceWatcher = Enumeration::DeviceInformation::CreateWatcher(Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort()));
 
 std::shared_ptr<BlueToothDevice> BlueToothDevice::Instance()
 {
@@ -18,19 +18,19 @@ std::shared_ptr<BlueToothDevice> BlueToothDevice::Instance()
 void BlueToothDevice::on_initialise()
 {
 	while (true) {
-		if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
-			cw.Start();
+		if (m_DeviceWatcher.Status() == Enumeration::DeviceWatcherStatus::Created) {
+			m_DeviceWatcher.Start();
 		}
 
-		if (cw.Status() == Enumeration::DeviceWatcherStatus::Started) {
+		if (m_DeviceWatcher.Status() == Enumeration::DeviceWatcherStatus::Started) {
 		}
 		else {
 			break;
 		}
 	}
 
-	if (devicesFound > 0) {
-		std::cout << "Has found" << devicesFound << " devices." << std::endl;
+	if (m_DevicesFound > 0) {
+		std::cout << "Has found" << m_DevicesFound << " devices." << std::endl;
 	}
 	else {
 		std::cout << "Didnt find any required devices" << std::endl;
@@ -39,22 +39,22 @@ void BlueToothDevice::on_initialise()
 
 void BlueToothDevice::connect(hstring DeviceId)
 {
-	if (!tDevice.get()) {
-		tDevice = std::make_shared<RfcommDeviceService>(RfcommDeviceService::FromIdAsync(DeviceId).get());
+	if (!m_RfcommDeviceService.get()) {
+		m_RfcommDeviceService = std::make_shared<RfcommDeviceService>(RfcommDeviceService::FromIdAsync(DeviceId).get());
 	}
 	else {
-		std::wcout << "A BlueTooth Has already been connected to. ID: " << tDevice->ConnectionHostName().DisplayName().c_str() << std::endl;
+		std::wcout << "A BlueTooth Has already been connected to. ID: " << m_RfcommDeviceService->ConnectionHostName().DisplayName().c_str() << std::endl;
 	}
 }
 
 void BlueToothDevice::disconnect()
 {
-	tDevice = nullptr;
+	m_RfcommDeviceService = nullptr;
 }
 
 bool BlueToothDevice::send(std::shared_ptr<void> payload)
 {
-	auto envoyer = DataWriter(btSS.OutputStream());
+	auto envoyer = DataWriter(m_StreamSocket.OutputStream());
 	envoyer.UnicodeEncoding(UnicodeEncoding::Utf8);
 	envoyer.ByteOrder(ByteOrder::BigEndian);
 
@@ -62,10 +62,17 @@ bool BlueToothDevice::send(std::shared_ptr<void> payload)
 	return false;
 }
 
+std::ostream & BlueToothDevice::operator<<(std::ostream & os)
+{
+	auto BtDevice = m_RfcommDeviceService->Device();
+	// TODO: insert return statement here
+	return os;
+}
+
 BlueToothDevice::BlueToothDevice()
 {
-	if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
-		cw.Added([&](auto &&, Enumeration::DeviceInformation temp) {
+	if (m_DeviceWatcher.Status() == Enumeration::DeviceWatcherStatus::Created) {
+		m_DeviceWatcher.Added([&](auto &&, Enumeration::DeviceInformation temp) {
 			std::wcout << "Device Name: " << temp.Name().c_str() << std::endl
 				<< "Device ID: " << temp.Id().c_str() << std::endl;
 
@@ -74,21 +81,21 @@ BlueToothDevice::BlueToothDevice()
 			auto di = Enumeration::DeviceInformation::CreateFromIdAsync(temp.Id(), additionalProperties);
 			//
 
-			tdi = temp.Id();
+			m_DeviceName = temp.Id();
 
 			std::cout << "Added happened." << std::endl;
 
 		});
 
-		cw.Updated([&](auto &&, Enumeration::DeviceInformationUpdate temp) {
+		m_DeviceWatcher.Updated([&](auto &&, Enumeration::DeviceInformationUpdate temp) {
 			std::cout << "Updated Happened." << std::endl;
-			tdi = temp.Id().c_str();
-			std::wcout << "Updated ID: " << tdi << std::endl;
+			m_DeviceName = temp.Id().c_str();
+			std::wcout << "Updated ID: " << m_DeviceName << std::endl;
 		});
 
-		cw.EnumerationCompleted([=](auto &&, auto &&) {
+		m_DeviceWatcher.EnumerationCompleted([=](auto &&, auto &&) {
 			std::cout << "Enum Completed" << std::endl;
-			cw.Stop();
+			m_DeviceWatcher.Stop();
 		});
 	}
 	else {
