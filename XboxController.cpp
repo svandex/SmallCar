@@ -31,8 +31,6 @@ void XboxController::showBattery()
 }
 
 XboxController::XboxController() {
-	isConnected = false;
-
 	Gamepad::GamepadAdded([=](auto &&, Gamepad newAdded) {
 		// add lock to prevent routines write to std::cout simutaneously
 		//std::cout << "isWireless :" << newAdded.IsWireless() << std::endl;

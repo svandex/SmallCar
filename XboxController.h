@@ -16,10 +16,10 @@ class XboxController {
 public:
 	static std::shared_ptr<Gamepad> Instance();
 	static void showBattery();
+
+	static bool isConnected = false;
 protected:
 	static std::shared_ptr<Gamepad> m_XboxController;
 private:
 	XboxController();
-
-	bool isConnected;
 };
