@@ -2,18 +2,16 @@
 
 #include "BlueToothDevice.h"
 
-std::shared_ptr<BlueToothDevice> BlueToothDevice::m_pInstance;
-
 Enumeration::DeviceWatcher BlueToothDevice::cw = Enumeration::DeviceInformation::CreateWatcher(Bluetooth::Rfcomm::RfcommDeviceService::GetDeviceSelector(Bluetooth::Rfcomm::RfcommServiceId::SerialPort()));
 
-BlueToothDevice * BlueToothDevice::Instance()
+std::shared_ptr<BlueToothDevice> BlueToothDevice::Instance()
 {
 	if (!m_pInstance.get()) {
 		m_pInstance = std::shared_ptr<BlueToothDevice>(new BlueToothDevice());
-		return m_pInstance.get();
+		return m_pInstance;
 	}
 	else {
-		return BlueToothDevice::m_pInstance.get();
+		return m_pInstance;
 	}
 }
 
@@ -39,6 +37,31 @@ void BlueToothDevice::on_initialise()
 	}
 }
 
+void BlueToothDevice::connect(hstring DeviceId)
+{
+	if (!tDevice.get()) {
+		tDevice = std::make_shared<RfcommDeviceService>(RfcommDeviceService::FromIdAsync(DeviceId).get());
+	}
+	else {
+		std::wcout << "A BlueTooth Has already been connected to. ID: " << tDevice->ConnectionHostName().DisplayName().c_str() << std::endl;
+	}
+}
+
+void BlueToothDevice::disconnect()
+{
+	tDevice = nullptr;
+}
+
+bool BlueToothDevice::send(std::shared_ptr<void> payload)
+{
+	auto envoyer = DataWriter(btSS.OutputStream());
+	envoyer.UnicodeEncoding(UnicodeEncoding::Utf8);
+	envoyer.ByteOrder(ByteOrder::BigEndian);
+
+	//CAUSTION: if send block, throw logic_error bluetooth device malfunction
+	return false;
+}
+
 BlueToothDevice::BlueToothDevice()
 {
 	if (cw.Status() == Enumeration::DeviceWatcherStatus::Created) {
@@ -46,17 +69,15 @@ BlueToothDevice::BlueToothDevice()
 			std::wcout << "Device Name: " << temp.Name().c_str() << std::endl
 				<< "Device ID: " << temp.Id().c_str() << std::endl;
 
-			//<< "isPaired: " << temp.Pairing().IsPaired() << std::endl;
-		//isPaired function doesnt' work.
+			//TODO: Select specified property
+			param::async_iterable<param::hstring> additionalProperties(IIterable<param::hstring>(L"System.InterfaceClassGuid"));
+			auto di = Enumeration::DeviceInformation::CreateFromIdAsync(temp.Id(), additionalProperties);
+			//
+
+			tdi = temp.Id();
+
 			std::cout << "Added happened." << std::endl;
 
-			//	if (wcscmp(temp.Name().c_str(), BBT_TARGETNAME) == 0) {// find device by NAME!! Optimized !
-			/*
-			std::wcout << "Result: " << std::wcsstr(temp.Id().c_str(), bthaddr_1) << std::endl;
-			if (std::wcsstr(temp.Id().c_str(), bthaddr_1)) {
-				devicesFound++;
-				tdi = temp.Id().c_str();
-			}*/
 		});
 
 		cw.Updated([&](auto &&, Enumeration::DeviceInformationUpdate temp) {
